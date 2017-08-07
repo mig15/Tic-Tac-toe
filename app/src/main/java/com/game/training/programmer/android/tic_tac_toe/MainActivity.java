@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent;
         switch (v.getId()) {
             case R.id.button_singleGame:
-                intent = new Intent(this, TicTacToe2.class);
+                intent = new Intent(this, SingleTicTacToe.class);
                 startActivity(intent);
                 break;
         }

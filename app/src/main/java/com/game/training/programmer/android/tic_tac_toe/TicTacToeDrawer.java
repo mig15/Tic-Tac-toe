@@ -9,10 +9,9 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
-public class GameLogic extends View {
+public class TicTacToeDrawer extends View {
 
     private Paint paintSeparativeLines;
-    private Path path;
 
     private Cross cross;
     private Zero zero;
@@ -39,36 +38,43 @@ public class GameLogic extends View {
     private float secondHorizontalSeparativeLineEndX;
     private float secondHorizontalSeparativeLineEndY;
 
-    private boolean cell1Free = true;
-    private boolean cell2Free = true;
-    private boolean cell3Free = true;
-    private boolean cell4Free = true;
-    private boolean cell5Free = true;
-    private boolean cell6Free = true;
-    private boolean cell7Free = true;
-    private boolean cell8Free = true;
-    private boolean cell9Free = true;
+    private int topLeftCell = 0;
+    private int topCenterCell = 0;
+    private int topRightCell = 0;
+    private int midLeftCell = 0;
+    private int midCenterCell = 0;
+    private int midRightCell = 0;
+    private int bottomLeftCell = 0;
+    private int bottomCenterCell = 0;
+    private int bottomRightCell = 0;
 
     private int cellNumber;
+    private int figureCode;
 
-    public GameLogic(Context context) {
+    public TicTacToeDrawer(Context context) {
         super(context);
         init(context, null, 0);
     }
 
-    public GameLogic(Context context, @Nullable AttributeSet attrs) {
+    public TicTacToeDrawer(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs, 0);
     }
 
-    public GameLogic(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public TicTacToeDrawer(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs, defStyleAttr);
     }
 
-    private void init(Context context, AttributeSet attrs, int defStyleAttr) {
-        path = new Path();
+    void setCellNumber(int cellNumber) {
+        this.cellNumber = cellNumber;
+    }
 
+    void setFigureCode(int figureCode) {
+        this.figureCode = figureCode;
+    }
+
+    private void init(Context context, AttributeSet attrs, int defStyleAttr) {
         paintSeparativeLines = new Paint();
         paintSeparativeLines.setColor(Color.GRAY);
         paintSeparativeLines.setStyle(Paint.Style.STROKE);
@@ -125,209 +131,228 @@ public class GameLogic extends View {
                 firstHorizontalSeparativeLineEndX, firstHorizontalSeparativeLineEndY, paintSeparativeLines);
         canvas.drawLine(secondHorizontalSeparativeLineStartX, secondHorizontalSeparativeLineStartY,
                 secondHorizontalSeparativeLineEndX, secondHorizontalSeparativeLineEndY, paintSeparativeLines);
+
+        if (figureCode == 0) {
+            zero.addZero();
+        } else if (figureCode == 1) {
+            cross.addCross();
+        }
+
+        canvas.drawPath(zero.pathZero, zero.paintZero);
+        canvas.drawPath(cross.pathCrosses, cross.paintCrosses);
     }
 
-    public void defineAndSetTouchCell(float x, float y) {
+    int defineTouchCell(float x, float y) {
         if (x < firstVerticalSeparativeLineStartX && y < firstHorizontalSeparativeLineStartY) {
-            cellNumber = 1;
+            return 1;
         } else if (x > firstVerticalSeparativeLineStartX && x < secondVerticalSeparativeLineStartX
                 && y < firstHorizontalSeparativeLineStartY) {
-            cellNumber = 2;
+            return 2;
         } else if (x > secondVerticalSeparativeLineStartX && y < firstHorizontalSeparativeLineStartY) {
-            cellNumber = 3;
+            return 3;
         } else if (x < firstVerticalSeparativeLineStartX && y > firstHorizontalSeparativeLineStartY
                 && y < secondHorizontalSeparativeLineStartY) {
-            cellNumber = 4;
+            return 4;
         } else if (x > firstVerticalSeparativeLineStartX && x < secondVerticalSeparativeLineStartX
                 && y > firstHorizontalSeparativeLineStartY && y < secondHorizontalSeparativeLineStartY) {
-            cellNumber = 5;
+            return 5;
         } else if (x > secondVerticalSeparativeLineStartX && y > firstHorizontalSeparativeLineStartY
                 && y < secondHorizontalSeparativeLineStartY) {
-            cellNumber = 6;
+            return 6;
         } else if (x < firstVerticalSeparativeLineStartX && y > secondHorizontalSeparativeLineStartY) {
-            cellNumber = 7;
+            return 7;
         } else if (x > firstVerticalSeparativeLineStartX && x < secondVerticalSeparativeLineStartX
                 && y > secondHorizontalSeparativeLineStartY) {
-            cellNumber = 8;
+            return 8;
         } else if (x > secondVerticalSeparativeLineStartX && y > secondHorizontalSeparativeLineStartY) {
-            cellNumber = 9;
+            return 9;
         }
+
+        return cellNumber;
     }
 
-    private boolean isCellFree(int cellNumber) {
+    int getCellState(int cellNumber) {
         switch (cellNumber) {
             case 1:
-                return cell1Free;
+                return topLeftCell;
             case 2:
-                return cell2Free;
+                return topCenterCell;
             case 3:
-                return cell3Free;
+                return topRightCell;
             case 4:
-                return cell4Free;
+                return midLeftCell;
             case 5:
-                return cell5Free;
+                return midCenterCell;
             case 6:
-                return cell6Free;
+                return midRightCell;
             case 7:
-                return cell7Free;
+                return bottomLeftCell;
             case 8:
-                return cell8Free;
+                return bottomCenterCell;
             case 9:
-                return cell9Free;
+                return bottomRightCell;
             default:
-                return false;
+                return 3;
         }
     }
 
     private class Cross {
 
         private Paint paintCrosses;
+        private Path pathCrosses;
 
         private Cross() {
+            pathCrosses = new Path();
+
             paintCrosses = new Paint();
-            paintCrosses.setColor(Color.BLUE);
             paintCrosses.setStyle(Paint.Style.STROKE);
+            paintCrosses.setColor(Color.BLUE);
             paintCrosses.setStrokeWidth(50);
         }
 
-        private void drawCrosses(Canvas canvas) {
+        private void addCross() {
             switch (cellNumber) {
                 case 1:
-                    path.moveTo(50, firstHorizontalSeparativeLineStartY - 50);
-                    path.lineTo(firstVerticalSeparativeLineStartX - 50, 50);
-                    path.moveTo(50, 50);
-                    path.lineTo(firstVerticalSeparativeLineStartX - 50, firstHorizontalSeparativeLineStartY - 50);
-                    cell1Free = false;
+                    pathCrosses.moveTo(50, firstHorizontalSeparativeLineStartY - 50);
+                    pathCrosses.lineTo(firstVerticalSeparativeLineStartX - 50, 50);
+                    pathCrosses.moveTo(50, 50);
+                    pathCrosses.lineTo(firstVerticalSeparativeLineStartX - 50, firstHorizontalSeparativeLineStartY - 50);
+                    topLeftCell = 2;
                     break;
                 case 2:
-                    path.moveTo(firstVerticalSeparativeLineStartX + 50, firstHorizontalSeparativeLineStartY - 50);
-                    path.lineTo(secondVerticalSeparativeLineStartX - 50, 50);
-                    path.moveTo(firstVerticalSeparativeLineStartX + 50, 50);
-                    path.lineTo(secondVerticalSeparativeLineStartX - 50, firstHorizontalSeparativeLineStartY - 50);
-                    cell2Free = false;
+                    pathCrosses.moveTo(firstVerticalSeparativeLineStartX + 50, firstHorizontalSeparativeLineStartY - 50);
+                    pathCrosses.lineTo(secondVerticalSeparativeLineStartX - 50, 50);
+                    pathCrosses.moveTo(firstVerticalSeparativeLineStartX + 50, 50);
+                    pathCrosses.lineTo(secondVerticalSeparativeLineStartX - 50, firstHorizontalSeparativeLineStartY - 50);
+                    topCenterCell = 2;
                     break;
                 case 3:
-                    path.moveTo(secondVerticalSeparativeLineStartX + 50, firstHorizontalSeparativeLineStartY - 50);
-                    path.lineTo(maxWidth - 50, 50);
-                    path.moveTo(secondVerticalSeparativeLineStartX + 50, 50);
-                    path.lineTo(maxWidth - 50, firstHorizontalSeparativeLineStartY - 50);
-                    cell3Free = false;
+                    pathCrosses.moveTo(secondVerticalSeparativeLineStartX + 50, firstHorizontalSeparativeLineStartY - 50);
+                    pathCrosses.lineTo(maxWidth - 50, 50);
+                    pathCrosses.moveTo(secondVerticalSeparativeLineStartX + 50, 50);
+                    pathCrosses.lineTo(maxWidth - 50, firstHorizontalSeparativeLineStartY - 50);
+                    topRightCell = 2;
                     break;
                 case 4:
-                    path.moveTo(50, secondHorizontalSeparativeLineStartY - 50);
-                    path.lineTo(firstVerticalSeparativeLineStartX - 50, firstHorizontalSeparativeLineStartY + 50);
-                    path.moveTo(50, firstHorizontalSeparativeLineStartY + 50);
-                    path.lineTo(firstVerticalSeparativeLineStartX - 50, secondHorizontalSeparativeLineStartY - 50);
-                    cell4Free = false;
+                    pathCrosses.moveTo(50, secondHorizontalSeparativeLineStartY - 50);
+                    pathCrosses.lineTo(firstVerticalSeparativeLineStartX - 50, firstHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.moveTo(50, firstHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.lineTo(firstVerticalSeparativeLineStartX - 50, secondHorizontalSeparativeLineStartY - 50);
+                    midLeftCell = 2;
                     break;
                 case 5:
-                    path.moveTo(firstVerticalSeparativeLineStartX + 50, secondHorizontalSeparativeLineStartY - 50);
-                    path.lineTo(secondVerticalSeparativeLineStartX - 50, firstHorizontalSeparativeLineStartY + 50);
-                    path.moveTo(firstVerticalSeparativeLineStartX + 50, firstHorizontalSeparativeLineStartY + 50);
-                    path.lineTo(secondVerticalSeparativeLineStartX - 50, secondHorizontalSeparativeLineStartY - 50);
-                    cell5Free = false;
+                    pathCrosses.moveTo(firstVerticalSeparativeLineStartX + 50, secondHorizontalSeparativeLineStartY - 50);
+                    pathCrosses.lineTo(secondVerticalSeparativeLineStartX - 50, firstHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.moveTo(firstVerticalSeparativeLineStartX + 50, firstHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.lineTo(secondVerticalSeparativeLineStartX - 50, secondHorizontalSeparativeLineStartY - 50);
+                    midCenterCell = 2;
                     break;
                 case 6:
-                    path.moveTo(secondVerticalSeparativeLineStartX + 50, secondHorizontalSeparativeLineStartY - 50);
-                    path.lineTo(maxWidth - 50, firstHorizontalSeparativeLineStartY + 50);
-                    path.moveTo(secondVerticalSeparativeLineStartX + 50, firstHorizontalSeparativeLineStartY + 50);
-                    path.lineTo(maxWidth - 50, secondHorizontalSeparativeLineStartY - 50);
-                    cell6Free = false;
+                    pathCrosses.moveTo(secondVerticalSeparativeLineStartX + 50, secondHorizontalSeparativeLineStartY - 50);
+                    pathCrosses.lineTo(maxWidth - 50, firstHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.moveTo(secondVerticalSeparativeLineStartX + 50, firstHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.lineTo(maxWidth - 50, secondHorizontalSeparativeLineStartY - 50);
+                    midRightCell = 2;
                     break;
                 case 7:
-                    path.moveTo(50, maxHeight - 50);
-                    path.lineTo(firstVerticalSeparativeLineStartX - 50, secondHorizontalSeparativeLineStartY + 50);
-                    path.moveTo(50, secondHorizontalSeparativeLineStartY + 50);
-                    path.lineTo(firstVerticalSeparativeLineStartX - 50, maxHeight - 50);
-                    cell7Free = false;
+                    pathCrosses.moveTo(50, maxHeight - 50);
+                    pathCrosses.lineTo(firstVerticalSeparativeLineStartX - 50, secondHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.moveTo(50, secondHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.lineTo(firstVerticalSeparativeLineStartX - 50, maxHeight - 50);
+                    bottomLeftCell = 2;
                     break;
                 case 8:
-                    path.moveTo(firstVerticalSeparativeLineStartX + 50, maxHeight - 50);
-                    path.lineTo(secondVerticalSeparativeLineStartX - 50, secondHorizontalSeparativeLineStartY + 50);
-                    path.moveTo(firstVerticalSeparativeLineStartX + 50, secondHorizontalSeparativeLineStartY + 50);
-                    path.lineTo(secondVerticalSeparativeLineStartX - 50, maxHeight - 50);
-                    cell8Free = false;
+                    pathCrosses.moveTo(firstVerticalSeparativeLineStartX + 50, maxHeight - 50);
+                    pathCrosses.lineTo(secondVerticalSeparativeLineStartX - 50, secondHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.moveTo(firstVerticalSeparativeLineStartX + 50, secondHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.lineTo(secondVerticalSeparativeLineStartX - 50, maxHeight - 50);
+                    bottomCenterCell = 2;
                     break;
                 case 9:
-                    path.moveTo(secondVerticalSeparativeLineStartX + 50, maxHeight - 50);
-                    path.lineTo(maxWidth - 50, secondHorizontalSeparativeLineStartY + 50);
-                    path.moveTo(secondVerticalSeparativeLineStartX + 50, secondHorizontalSeparativeLineStartY + 50);
-                    path.lineTo(maxWidth - 50, maxHeight - 50);
-                    cell9Free = false;
+                    pathCrosses.moveTo(secondVerticalSeparativeLineStartX + 50, maxHeight - 50);
+                    pathCrosses.lineTo(maxWidth - 50, secondHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.moveTo(secondVerticalSeparativeLineStartX + 50, secondHorizontalSeparativeLineStartY + 50);
+                    pathCrosses.lineTo(maxWidth - 50, maxHeight - 50);
+                    bottomRightCell = 2;
                     break;
             }
-            canvas.drawPath(path, paintCrosses);
         }
     }
 
     private class Zero {
 
         private Paint paintZero;
+        private Path pathZero;
 
         private float radiusZero;
 
-        private Zero() {
+        Zero() {
+            pathZero = new Path();
+
             paintZero = new Paint();
-            paintZero.setColor(Color.RED);
             paintZero.setStyle(Paint.Style.STROKE);
+            paintZero.setColor(Color.RED);
             paintZero.setStrokeWidth(50);
+
         }
 
         private void setRadiusZero(float radiusZero) {
             this.radiusZero = radiusZero;
         }
 
-        private void drawZero(Canvas canvas) {
+        private void addZero() {
+            paintZero.setColor(Color.RED);
+            paintZero.setStrokeWidth(50);
+
             switch (cellNumber) {
                 case 1:
-                    path.addCircle(firstVerticalSeparativeLineStartX / 2, firstHorizontalSeparativeLineStartY / 2,
+                    pathZero.addCircle(firstVerticalSeparativeLineStartX / 2, firstHorizontalSeparativeLineStartY / 2,
                             radiusZero, Path.Direction.CCW);
-                    cell1Free = false;
+                    topLeftCell = 1;
                     break;
                 case 2:
-                    path.addCircle(maxWidth / 2, firstHorizontalSeparativeLineStartY / 2,
+                    pathZero.addCircle(maxWidth / 2, firstHorizontalSeparativeLineStartY / 2,
                             radiusZero, Path.Direction.CCW);
-                    cell2Free = false;
+                    topCenterCell = 1;
                     break;
                 case 3:
-                    path.addCircle(secondVerticalSeparativeLineStartX + (firstVerticalSeparativeLineStartX / 2),
+                    pathZero.addCircle(secondVerticalSeparativeLineStartX + (firstVerticalSeparativeLineStartX / 2),
                             firstHorizontalSeparativeLineStartY / 2, radiusZero, Path.Direction.CCW);
-                    cell3Free = false;
+                    topRightCell = 1;
                     break;
                 case 4:
-                    path.addCircle(firstVerticalSeparativeLineStartX / 2, maxHeight / 2,
+                    pathZero.addCircle(firstVerticalSeparativeLineStartX / 2, maxHeight / 2,
                             radiusZero, Path.Direction.CCW);
-                    cell4Free = false;
+                    midLeftCell = 1;
                     break;
                 case 5:
-                    path.addCircle(maxWidth / 2, maxHeight / 2, radiusZero, Path.Direction.CCW);
-                    cell5Free = false;
+                    pathZero.addCircle(maxWidth / 2, maxHeight / 2, radiusZero, Path.Direction.CCW);
+                    midCenterCell = 1;
                     break;
                 case 6:
-                    path.addCircle(secondVerticalSeparativeLineStartX + (firstVerticalSeparativeLineStartX / 2),
+                    pathZero.addCircle(secondVerticalSeparativeLineStartX + (firstVerticalSeparativeLineStartX / 2),
                             maxHeight / 2, radiusZero, Path.Direction.CCW);
-                    cell6Free = false;
+                    midRightCell = 1;
                     break;
                 case 7:
-                    path.addCircle(firstVerticalSeparativeLineStartX / 2,
+                    pathZero.addCircle(firstVerticalSeparativeLineStartX / 2,
                             secondHorizontalSeparativeLineStartY + (firstHorizontalSeparativeLineStartY / 2),
                             radiusZero, Path.Direction.CCW);
-                    cell7Free = false;
+                    bottomLeftCell = 1;
                     break;
                 case 8:
-                    path.addCircle(maxWidth / 2,
+                    pathZero.addCircle(maxWidth / 2,
                             secondHorizontalSeparativeLineStartY + (firstHorizontalSeparativeLineStartY / 2),
                             radiusZero, Path.Direction.CCW);
-                    cell8Free = false;
+                    bottomCenterCell = 1;
                     break;
                 case 9:
-                    path.addCircle(secondVerticalSeparativeLineStartX + (firstVerticalSeparativeLineStartX / 2),
+                    pathZero.addCircle(secondVerticalSeparativeLineStartX + (firstVerticalSeparativeLineStartX / 2),
                             secondHorizontalSeparativeLineStartY + (firstHorizontalSeparativeLineStartY / 2),
                             radiusZero, Path.Direction.CCW);
-                    cell9Free = false;
+                    bottomRightCell = 1;
                     break;
             }
-            canvas.drawPath(path, paintZero);
         }
     }
 }
