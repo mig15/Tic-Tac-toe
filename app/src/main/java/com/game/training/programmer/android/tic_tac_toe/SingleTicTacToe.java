@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -100,7 +99,6 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
                 countComputerStep++;
             } else if (countComputerStep > 1) {
                 cell = checkLinesOnVictory();
-                Log.d("---My Log---", Integer.toString(cell));
                 view_gameField.setCellNumber(cell);
                 view_gameField.setFigureCode(computerFigureCode);
                 view_gameField.invalidate();
@@ -115,6 +113,7 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
     }
 
     private int checkLinesOnVictory() {
+        int free = 0; // free cell state
         int var; // state of cell with player figure
         if (playerFigureCode == 1) {
             var = 2; // cross code
@@ -123,37 +122,101 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
         }
 
         if (view_gameField.getCellState(TOP_LEFT_CELL) == var && view_gameField.getCellState(TOP_CENTER_CELL) == var) {
-            return TOP_RIGHT_CELL;
-        } else if (view_gameField.getCellState(TOP_RIGHT_CELL) == var && view_gameField.getCellState(TOP_CENTER_CELL) == var) {
-            return TOP_LEFT_CELL;
-        } else if (view_gameField.getCellState(MID_LEFT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            return MID_RIGHT_CELL;
-        } else if (view_gameField.getCellState(MID_RIGHT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            return MID_LEFT_CELL;
-        } else if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == var && view_gameField.getCellState(BOTTOM_CENTER_CELL) == var) {
-            return BOTTOM_RIGHT_CELL;
-        } else if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var && view_gameField.getCellState(BOTTOM_CENTER_CELL) == var) {
-            return BOTTOM_LEFT_CELL;
-        } else if (view_gameField.getCellState(TOP_LEFT_CELL) == var && view_gameField.getCellState(MID_LEFT_CELL) == var) {
-            return BOTTOM_LEFT_CELL;
-        } else if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == var && view_gameField.getCellState(MID_LEFT_CELL) == var) {
-            return TOP_LEFT_CELL;
-        } else if (view_gameField.getCellState(TOP_CENTER_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            return BOTTOM_CENTER_CELL;
-        } else if (view_gameField.getCellState(BOTTOM_CENTER_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            return TOP_CENTER_CELL;
-        } else if (view_gameField.getCellState(TOP_RIGHT_CELL) == var && view_gameField.getCellState(MID_RIGHT_CELL) == var) {
-            return BOTTOM_RIGHT_CELL;
-        } else if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var && view_gameField.getCellState(MID_RIGHT_CELL) == var) {
-            return TOP_RIGHT_CELL;
-        } else if (view_gameField.getCellState(TOP_LEFT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            return BOTTOM_RIGHT_CELL;
-        } else if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            return TOP_LEFT_CELL;
-        } else if (view_gameField.getCellState(TOP_RIGHT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            return BOTTOM_LEFT_CELL;
-        } else if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            return TOP_RIGHT_CELL;
-        } else return 0;
+            if (view_gameField.getCellState(TOP_RIGHT_CELL) == free) {
+                return TOP_RIGHT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(TOP_RIGHT_CELL) == var && view_gameField.getCellState(TOP_CENTER_CELL) == var) {
+            if (view_gameField.getCellState(TOP_LEFT_CELL) == free) {
+                return TOP_LEFT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(MID_LEFT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
+            if (view_gameField.getCellState(MID_RIGHT_CELL) == free) {
+                return MID_RIGHT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(MID_RIGHT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
+            if (view_gameField.getCellState(MID_LEFT_CELL) == free) {
+                return MID_LEFT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == var && view_gameField.getCellState(BOTTOM_CENTER_CELL) == var) {
+            if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == free) {
+                return BOTTOM_RIGHT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var && view_gameField.getCellState(BOTTOM_CENTER_CELL) == var) {
+            if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == free) {
+                return BOTTOM_LEFT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(TOP_LEFT_CELL) == var && view_gameField.getCellState(MID_LEFT_CELL) == var) {
+            if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == free) {
+                return BOTTOM_LEFT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == var && view_gameField.getCellState(MID_LEFT_CELL) == var) {
+            if (view_gameField.getCellState(TOP_LEFT_CELL) == free) {
+                return TOP_LEFT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(TOP_CENTER_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
+            if (view_gameField.getCellState(BOTTOM_CENTER_CELL) == free) {
+                return BOTTOM_CENTER_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(BOTTOM_CENTER_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
+            if (view_gameField.getCellState(TOP_CENTER_CELL) == free) {
+                return TOP_CENTER_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(TOP_RIGHT_CELL) == var && view_gameField.getCellState(MID_RIGHT_CELL) == var) {
+            if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == free) {
+                return BOTTOM_RIGHT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var && view_gameField.getCellState(MID_RIGHT_CELL) == var) {
+            if (view_gameField.getCellState(TOP_RIGHT_CELL) == free) {
+                return TOP_RIGHT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(TOP_LEFT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
+            if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == free) {
+                return BOTTOM_RIGHT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
+            if (view_gameField.getCellState(TOP_LEFT_CELL) == free) {
+                return TOP_LEFT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(TOP_RIGHT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
+            if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == free) {
+                return BOTTOM_LEFT_CELL;
+            }
+        }
+
+        if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
+            if (view_gameField.getCellState(TOP_RIGHT_CELL) == free) {
+                return TOP_RIGHT_CELL;
+            }
+        }
+
+        return 0;
     }
 }
