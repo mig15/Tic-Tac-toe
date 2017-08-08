@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -95,7 +94,7 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
 
     private void doComputerStep() {
         int cell;
-        if (computerStep) {
+        if (computerStep && computerFigureCode == 0) {
             computerStep = false;
             if (countComputerStep == 1) {
                 if (isCellFree(MID_CENTER_CELL)) {
@@ -116,9 +115,16 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
                     view_gameField.invalidate();
                 } else {
                     getRemainingFreeCells();
-                    view_gameField.setCellNumber(getRemainingFreeCellForStep());
-                    view_gameField.setFigureCode(computerFigureCode);
-                    view_gameField.invalidate();
+                    if (view_gameField.getCellState(TOP_LEFT_CELL) == 2 && view_gameField.getCellState(BOTTOM_RIGHT_CELL) == 2) {
+                        // 2 state of cell with cross
+                        view_gameField.setCellNumber(MID_RIGHT_CELL);
+                        view_gameField.setFigureCode(computerFigureCode);
+                        view_gameField.invalidate();
+                    } else {
+                        view_gameField.setCellNumber(getRemainingFreeCellForStep());
+                        view_gameField.setFigureCode(computerFigureCode);
+                        view_gameField.invalidate();
+                    }
                 }
                 countComputerStep++;
             } else if (countComputerStep >= 3) {
