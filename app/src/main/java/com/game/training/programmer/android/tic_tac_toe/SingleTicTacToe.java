@@ -4,9 +4,13 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchListener,
         ViewTreeObserver.OnGlobalLayoutListener {
@@ -21,9 +25,12 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
     private static final int BOTTOM_CENTER_CELL = 8;
     private static final int BOTTOM_RIGHT_CELL = 9;
 
+    private Random random;
+
     private ConstraintLayout constraintLayout_parent;
     private TicTacToeDrawer view_gameField;
 
+    private ArrayList<Integer> arrayFreeCell;
     private boolean myStep = true;
     private boolean computerStep = false;
     private int playerFigureCode = 1;
@@ -34,6 +41,8 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tictactoe);
+
+        random = new Random();
 
         constraintLayout_parent = (ConstraintLayout) findViewById(R.id.constraintLayout_parent_activity_main);
         constraintLayout_parent.setOnClickListener(new View.OnClickListener() {
@@ -46,6 +55,8 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
         ViewTreeObserver viewTreeObserver = view_gameField.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(this);
         view_gameField.setOnTouchListener(this);
+
+        arrayFreeCell = new ArrayList<>();
     }
 
     @Override
@@ -97,11 +108,21 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
                     view_gameField.invalidate();
                 }
                 countComputerStep++;
-            } else if (countComputerStep > 1) {
-                cell = checkLinesOnVictory();
-                view_gameField.setCellNumber(cell);
-                view_gameField.setFigureCode(computerFigureCode);
-                view_gameField.invalidate();
+            } else if (countComputerStep == 2) {
+                cell = checkLinesOnPlayerVictory();
+                if (cell != 0) {
+                    view_gameField.setCellNumber(cell);
+                    view_gameField.setFigureCode(computerFigureCode);
+                    view_gameField.invalidate();
+                } else {
+                    getRemainingFreeCells();
+                    view_gameField.setCellNumber(getRemainingFreeCellForStep());
+                    view_gameField.setFigureCode(computerFigureCode);
+                    view_gameField.invalidate();
+                }
+                countComputerStep++;
+            } else if (countComputerStep >= 3) {
+
             }
 
             myStep = true;
@@ -112,7 +133,7 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
         return view_gameField.getCellState(cell) == 0;
     }
 
-    private int checkLinesOnVictory() {
+    private int checkLinesOnPlayerVictory() {
         int free = 0; // free cell state
         int var; // state of cell with player figure
         if (playerFigureCode == 1) {
@@ -218,5 +239,22 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
         }
 
         return 0;
+    }
+
+    private void getRemainingFreeCells() {
+        int cellAmount = 9;
+        int var;
+        arrayFreeCell.clear();
+        for (int i = 1; i <= cellAmount; i++) {
+            var = view_gameField.getCellState(i);
+            if (var == 0) {
+                arrayFreeCell.add(i);
+            }
+        }
+    }
+
+    private int getRemainingFreeCellForStep() {
+        int var = random.nextInt(arrayFreeCell.size());
+        return arrayFreeCell.get(var);
     }
 }
