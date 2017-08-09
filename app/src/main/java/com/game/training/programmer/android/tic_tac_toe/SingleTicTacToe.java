@@ -47,7 +47,7 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
         constraintLayout_parent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                doComputerStep();
+                doNextComputerStep();
             }
         });
         view_gameField = (TicTacToeDrawer) findViewById(R.id.view_gameField_activity_main);
@@ -92,48 +92,32 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
         }
     }
 
-    private void doComputerStep() {
-        int cell;
+    private void doNextComputerStep() {
+        if (countComputerStep == 1) {
+            doComputerStepOne();
+        }
+
+        if (countComputerStep == 2) {
+            doComputerStepTwo();
+        }
+
+        if (countComputerStep >= 3) {
+            doComputerStepThree();
+        }
+    }
+
+    private void doComputerStepOne() {
         if (computerStep && computerFigureCode == 0) {
             computerStep = false;
 
-            if (countComputerStep == 1) {
-                if (isCellFree(MID_CENTER_CELL)) {
-                    view_gameField.setCellNumber(MID_CENTER_CELL);
-                    view_gameField.setFigureCode(computerFigureCode);
-                    view_gameField.invalidate();
-                } else {
-                    view_gameField.setCellNumber(BOTTOM_LEFT_CELL);
-                    view_gameField.setFigureCode(computerFigureCode);
-                    view_gameField.invalidate();
-                }
-            }
-
-            if (countComputerStep == 2) {
-                cell = checkLinesOnPlayerVictory();
-                if (cell != 0) {
-                    view_gameField.setCellNumber(cell);
-                    view_gameField.setFigureCode(computerFigureCode);
-                    view_gameField.invalidate();
-                } else {
-                    if (view_gameField.getCellState(TOP_LEFT_CELL) == 2 && view_gameField.getCellState(BOTTOM_RIGHT_CELL) == 2
-                            || view_gameField.getCellState(TOP_RIGHT_CELL) == 2 && view_gameField.getCellState(BOTTOM_LEFT_CELL) == 2) {
-                        // 2 state of cell with cross
-                        view_gameField.setCellNumber(MID_RIGHT_CELL);
-                        view_gameField.setFigureCode(computerFigureCode);
-                        view_gameField.invalidate();
-                    } else {
-                        defineRemainingFreeCells();
-                        int var = getFreeCellForNextStep();
-                        view_gameField.setCellNumber(var);
-                        view_gameField.setFigureCode(computerFigureCode);
-                        view_gameField.invalidate();
-                    }
-                }
-            }
-
-            if (countComputerStep >= 3) {
-
+            if (isCellFree(MID_CENTER_CELL)) {
+                view_gameField.setCellNumber(MID_CENTER_CELL);
+                view_gameField.setFigureCode(computerFigureCode);
+                view_gameField.invalidate();
+            } else {
+                view_gameField.setCellNumber(BOTTOM_LEFT_CELL);
+                view_gameField.setFigureCode(computerFigureCode);
+                view_gameField.invalidate();
             }
 
             countComputerStep++;
@@ -141,152 +125,202 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
         }
     }
 
-    private boolean isCellFree(int cell) {
-        return view_gameField.getCellState(cell) == 0;
+    private void doComputerStepTwo() {
+        if (computerStep && computerFigureCode == 0) {
+            computerStep = false;
+            int cell = checkLinesOnPlayerVictory();
+            if (cell != 0) {
+                view_gameField.setCellNumber(cell);
+                view_gameField.setFigureCode(computerFigureCode);
+                view_gameField.invalidate();
+            } else {
+                if ((view_gameField.getCellState(TOP_LEFT_CELL) == TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS
+                        && view_gameField.getCellState(BOTTOM_RIGHT_CELL) == TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS)
+                        || (view_gameField.getCellState(TOP_RIGHT_CELL) == TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS
+                        && view_gameField.getCellState(BOTTOM_LEFT_CELL) == TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS)) {
+                    view_gameField.setCellNumber(MID_RIGHT_CELL);
+                    view_gameField.setFigureCode(computerFigureCode);
+                    view_gameField.invalidate();
+                } else if (view_gameField.getCellState(TOP_LEFT_CELL) == TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS
+                        && view_gameField.getCellState(MID_RIGHT_CELL) == TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS) {
+                    view_gameField.setCellNumber(TOP_RIGHT_CELL);
+                    view_gameField.setFigureCode(computerFigureCode);
+                    view_gameField.invalidate();
+                } else {
+                    defineRemainingFreeCells();
+                    int var = getFreeCellForNextStep();
+                    view_gameField.setCellNumber(var);
+                    view_gameField.setFigureCode(computerFigureCode);
+                    view_gameField.invalidate();
+                }
+            }
+
+            countComputerStep++;
+            myStep = true;
+        }
+    }
+
+    private void doComputerStepThree() {
+        // TODO
+        if (computerStep && computerFigureCode == 0) {
+            computerStep = false;
+            int cell = checkLinesOnPlayerVictory();
+            if (cell != 0) {
+                view_gameField.setCellNumber(cell);
+                view_gameField.setFigureCode(computerFigureCode);
+                view_gameField.invalidate();
+            }
+
+            countComputerStep++;
+            myStep = true;
+        }
     }
 
     private int checkLinesOnPlayerVictory() {
-        int free = 0; // free cell state
         int var; // state of cell with player figure
         if (playerFigureCode == 1) {
-            var = 2; // cross code
+            var = TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS;
         } else {
-            var = 1; // zero code
+            var = TicTacToeDrawer.STATE_OF_CELL_WITH_ZERO;
         }
 
         if (view_gameField.getCellState(TOP_LEFT_CELL) == var && view_gameField.getCellState(TOP_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(TOP_RIGHT_CELL) == free) {
+            if (isCellFree(TOP_RIGHT_CELL)) {
                 return TOP_RIGHT_CELL;
             }
         }
 
         if (view_gameField.getCellState(TOP_RIGHT_CELL) == var && view_gameField.getCellState(TOP_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(TOP_LEFT_CELL) == free) {
+            if (isCellFree(TOP_LEFT_CELL)) {
                 return TOP_LEFT_CELL;
             }
         }
 
         if (view_gameField.getCellState(MID_LEFT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(MID_RIGHT_CELL) == free) {
+            if (isCellFree(MID_RIGHT_CELL)) {
                 return MID_RIGHT_CELL;
             }
         }
 
         if (view_gameField.getCellState(MID_RIGHT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(MID_LEFT_CELL) == free) {
+            if (isCellFree(MID_LEFT_CELL)) {
                 return MID_LEFT_CELL;
             }
         }
 
         if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == var && view_gameField.getCellState(BOTTOM_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == free) {
+            if (isCellFree(BOTTOM_RIGHT_CELL)) {
                 return BOTTOM_RIGHT_CELL;
             }
         }
 
         if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var && view_gameField.getCellState(BOTTOM_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == free) {
+            if (isCellFree(BOTTOM_LEFT_CELL)) {
                 return BOTTOM_LEFT_CELL;
             }
         }
 
         if (view_gameField.getCellState(TOP_LEFT_CELL) == var && view_gameField.getCellState(MID_LEFT_CELL) == var) {
-            if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == free) {
+            if (isCellFree(BOTTOM_LEFT_CELL)) {
                 return BOTTOM_LEFT_CELL;
             }
         }
 
         if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == var && view_gameField.getCellState(MID_LEFT_CELL) == var) {
-            if (view_gameField.getCellState(TOP_LEFT_CELL) == free) {
+            if (isCellFree(TOP_LEFT_CELL)) {
                 return TOP_LEFT_CELL;
             }
         }
 
         if (view_gameField.getCellState(TOP_CENTER_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(BOTTOM_CENTER_CELL) == free) {
+            if (isCellFree(BOTTOM_CENTER_CELL)) {
                 return BOTTOM_CENTER_CELL;
             }
         }
 
         if (view_gameField.getCellState(BOTTOM_CENTER_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(TOP_CENTER_CELL) == free) {
+            if (isCellFree(TOP_CENTER_CELL)) {
                 return TOP_CENTER_CELL;
             }
         }
 
         if (view_gameField.getCellState(TOP_RIGHT_CELL) == var && view_gameField.getCellState(MID_RIGHT_CELL) == var) {
-            if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == free) {
+            if (isCellFree(BOTTOM_RIGHT_CELL)) {
                 return BOTTOM_RIGHT_CELL;
             }
         }
 
         if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var && view_gameField.getCellState(MID_RIGHT_CELL) == var) {
-            if (view_gameField.getCellState(TOP_RIGHT_CELL) == free) {
+            if (isCellFree(TOP_RIGHT_CELL)) {
                 return TOP_RIGHT_CELL;
             }
         }
 
         if (view_gameField.getCellState(TOP_LEFT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == free) {
+            if (isCellFree(BOTTOM_RIGHT_CELL)) {
                 return BOTTOM_RIGHT_CELL;
             }
         }
 
         if (view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(TOP_LEFT_CELL) == free) {
+            if (isCellFree(TOP_LEFT_CELL)) {
                 return TOP_LEFT_CELL;
             }
         }
 
         if (view_gameField.getCellState(TOP_RIGHT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == free) {
+            if (isCellFree(BOTTOM_LEFT_CELL)) {
                 return BOTTOM_LEFT_CELL;
             }
         }
 
         if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == var && view_gameField.getCellState(MID_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(TOP_RIGHT_CELL) == free) {
+            if (isCellFree(TOP_RIGHT_CELL)) {
                 return TOP_RIGHT_CELL;
             }
         }
 
         if (view_gameField.getCellState(TOP_LEFT_CELL) == var && view_gameField.getCellState(TOP_RIGHT_CELL) == var) {
-            if (view_gameField.getCellState(TOP_CENTER_CELL) == free) {
+            if (isCellFree(TOP_CENTER_CELL)) {
                 return TOP_CENTER_CELL;
             }
         }
 
         if (view_gameField.getCellState(MID_LEFT_CELL) == var && view_gameField.getCellState(MID_RIGHT_CELL) == var) {
-            if (view_gameField.getCellState(MID_CENTER_CELL) == free) {
+            if (isCellFree(MID_CENTER_CELL)) {
                 return MID_CENTER_CELL;
             }
         }
 
         if (view_gameField.getCellState(BOTTOM_LEFT_CELL) == var && view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var) {
-            if (view_gameField.getCellState(BOTTOM_CENTER_CELL) == free) {
+            if (isCellFree(BOTTOM_CENTER_CELL)) {
                 return BOTTOM_CENTER_CELL;
             }
         }
 
         if (view_gameField.getCellState(TOP_LEFT_CELL) == var && view_gameField.getCellState(BOTTOM_LEFT_CELL) == var) {
-            if (view_gameField.getCellState(MID_LEFT_CELL) == free) {
+            if (isCellFree(MID_LEFT_CELL)) {
                 return MID_LEFT_CELL;
             }
         }
 
         if (view_gameField.getCellState(TOP_CENTER_CELL) == var && view_gameField.getCellState(BOTTOM_CENTER_CELL) == var) {
-            if (view_gameField.getCellState(MID_CENTER_CELL) == free) {
+            if (isCellFree(MID_CENTER_CELL)) {
                 return MID_CENTER_CELL;
             }
         }
 
         if (view_gameField.getCellState(TOP_RIGHT_CELL) == var && view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var) {
-            if (view_gameField.getCellState(MID_RIGHT_CELL) == free) {
+            if (isCellFree(MID_RIGHT_CELL)) {
                 return MID_RIGHT_CELL;
             }
         }
 
         return 0;
+    }
+
+    private boolean isCellFree(int cell) {
+        return view_gameField.getCellState(cell) == TicTacToeDrawer.STATE_OF_FREE_CELL;
     }
 
     private void defineRemainingFreeCells() {
@@ -304,34 +338,20 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
     private int getFreeCellForNextStep() {
         int var; // state of cell with player figure
         if (playerFigureCode == 1) {
-            var = 2; // cross code
+            var = TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS;
         } else {
-            var = 1; // zero code
+            var = TicTacToeDrawer.STATE_OF_CELL_WITH_ZERO;
         }
 
         while (true) {
             int cell = arrayFreeCell.get(random.nextInt(arrayFreeCell.size()));
             switch (cell) {
-                case TOP_LEFT_CELL:
-                    if ((view_gameField.getCellState(TOP_CENTER_CELL) == var || view_gameField.getCellState(TOP_RIGHT_CELL) == var)
-                            && (view_gameField.getCellState(MID_LEFT_CELL) == var || view_gameField.getCellState(BOTTOM_LEFT_CELL) == var)) {
-                        continue;
-                    } else {
-                        return TOP_LEFT_CELL;
-                    }
                 case TOP_CENTER_CELL:
                     if ((view_gameField.getCellState(TOP_LEFT_CELL) == var || view_gameField.getCellState(TOP_RIGHT_CELL) == var)
                             && (view_gameField.getCellState(MID_CENTER_CELL) == var || view_gameField.getCellState(BOTTOM_CENTER_CELL) == var)) {
                         continue;
                     } else {
                         return TOP_CENTER_CELL;
-                    }
-                case TOP_RIGHT_CELL:
-                    if ((view_gameField.getCellState(TOP_LEFT_CELL) == var || view_gameField.getCellState(TOP_CENTER_CELL) == var)
-                            && (view_gameField.getCellState(MID_RIGHT_CELL) == var || view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var)) {
-                        continue;
-                    } else {
-                        return TOP_RIGHT_CELL;
                     }
                 case MID_LEFT_CELL:
                     if ((view_gameField.getCellState(TOP_LEFT_CELL) == var || view_gameField.getCellState(BOTTOM_LEFT_CELL) == var)
@@ -347,26 +367,12 @@ public class SingleTicTacToe extends AppCompatActivity implements View.OnTouchLi
                     } else {
                         return MID_RIGHT_CELL;
                     }
-                case BOTTOM_LEFT_CELL:
-                    if ((view_gameField.getCellState(TOP_LEFT_CELL) == var || view_gameField.getCellState(MID_LEFT_CELL) == var)
-                            && (view_gameField.getCellState(BOTTOM_CENTER_CELL) == var || view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var)) {
-                        continue;
-                    } else {
-                        return BOTTOM_LEFT_CELL;
-                    }
                 case BOTTOM_CENTER_CELL:
                     if ((view_gameField.getCellState(BOTTOM_LEFT_CELL) == var || view_gameField.getCellState(BOTTOM_RIGHT_CELL) == var)
                             && (view_gameField.getCellState(MID_CENTER_CELL) == var || view_gameField.getCellState(TOP_CENTER_CELL) == var)) {
                         continue;
                     } else {
                         return BOTTOM_CENTER_CELL;
-                    }
-                case BOTTOM_RIGHT_CELL:
-                    if ((view_gameField.getCellState(TOP_RIGHT_CELL) == var || view_gameField.getCellState(MID_RIGHT_CELL) == var)
-                            && (view_gameField.getCellState(BOTTOM_CENTER_CELL) == var || view_gameField.getCellState(BOTTOM_LEFT_CELL) == var)) {
-                        continue;
-                    } else {
-                        return BOTTOM_RIGHT_CELL;
                     }
                 default:
                     return 0;

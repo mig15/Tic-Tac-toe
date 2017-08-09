@@ -11,6 +11,10 @@ import android.view.View;
 
 public class TicTacToeDrawer extends View {
 
+    static final int STATE_OF_FREE_CELL = 0;
+    static final int STATE_OF_CELL_WITH_ZERO = 1;
+    static final int STATE_OF_CELL_WITH_CROSS = 2;
+
     private Paint paintSeparativeLines;
 
     private Cross cross;
