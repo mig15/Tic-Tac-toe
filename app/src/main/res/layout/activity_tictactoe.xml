@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:padding="10dp"
     android:background="#0000FF"
-    tools:context="com.game.training.programmer.android.tic_tac_toe.SingleTicTacToe">
+    tools:context="com.game.training.programmer.android.tic_tac_toe.SingleLogic">
 
     <com.game.training.programmer.android.tic_tac_toe.TicTacToeDrawer
         android:id="@+id/view_gameField_activity_main"
