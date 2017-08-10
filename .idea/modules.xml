@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Tic-tac-toe.iml" filepath="$PROJECT_DIR$/Tic-tac-toe.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tic-tac-toeserver/tic-tac-toeserver.iml" filepath="$PROJECT_DIR$/tic-tac-toeserver/tic-tac-toeserver.iml" />
     </modules>
   </component>
 </project>

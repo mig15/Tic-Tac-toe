@@ -9,7 +9,7 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button button_singleGame;
+    private Button button_singleGame, button_multiGame;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -18,6 +18,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         button_singleGame = (Button) findViewById(R.id.button_singleGame);
         button_singleGame.setOnClickListener(this);
+        button_multiGame = (Button) findViewById(R.id.button_multiGame);
+        button_multiGame.setOnClickListener(this);
     }
 
     @Override
@@ -26,6 +28,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.button_singleGame:
                 intent = new Intent(this, SingleLogic.class);
+                startActivity(intent);
+                break;
+            case R.id.button_multiGame:
+                intent = new Intent(this, MultiLogic.class);
                 startActivity(intent);
                 break;
         }
