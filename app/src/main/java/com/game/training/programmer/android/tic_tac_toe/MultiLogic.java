@@ -20,8 +20,6 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
         ViewTreeObserver.OnGlobalLayoutListener {
 
     private static final String HOST_IP = "192.168.221.178";
-    private static final String OPPONENT_VALUE = "opponent";
-    private static final String FIGURE_VALUE = "figure";
 
     private Socket fromServerSocket;
     private BufferedReader in;
@@ -31,6 +29,8 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
     private TicTacToeDrawer view_gameField;
 
     private boolean opponent;
+    private int figureCode;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,6 +81,7 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
                 try {
                     while ((input = in.readLine()) != null)  {
                         Log.d("---My Log---", input);
+                        f(input);
                     }
                 } catch (IOException e) {
 
@@ -99,6 +100,20 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
             out.close();
         } catch (IOException e) {
 
+        }
+    }
+
+    private void f(String pack) {
+        switch (pack) {
+            case "server:opponent:true":
+                opponent = true;
+                break;
+            case "server:figure:zero":
+                figureCode = 0;
+                break;
+            case "server:figure:cross":
+                figureCode = 1;
+                break;
         }
     }
 }

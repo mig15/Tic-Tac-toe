@@ -39,8 +39,8 @@ class Client {
             @Override
             public void run() {
                 if (MyClass.isMaximumClients()) {
-                    String pack = "server:opponent:true".concat("\n").concat(figure);
-                    out.println(pack);
+                    out.println("server:opponent:true");
+                    out.println(figure);
                 }
 
                 String input;
