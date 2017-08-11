@@ -1,6 +1,8 @@
 package com.game.training.programmer.android.tic_tac_toe;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
@@ -24,6 +26,7 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
     private Socket fromServerSocket;
     private BufferedReader in;
     private PrintWriter out;
+    private Handler handler;
 
     private ConstraintLayout constraintLayout_parent;
     private TicTacToeDrawer view_gameField;
@@ -44,6 +47,14 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
         view_gameField.setOnTouchListener(this);
 
         runConnection();
+
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                String s = msg.obj.toString();
+                f(s);
+            }
+        };
     }
 
     @Override
@@ -80,8 +91,7 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
                 String input;
                 try {
                     while ((input = in.readLine()) != null)  {
-                        Log.d("---My Log---", input);
-                        f(input);
+                        handler.sendMessage(handler.obtainMessage(0, input));
                     }
                 } catch (IOException e) {
 
@@ -104,6 +114,7 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
     }
 
     private void f(String pack) {
+        Log.d("---My Log---", pack);
         switch (pack) {
             case "server:opponent:true":
                 opponent = true;
