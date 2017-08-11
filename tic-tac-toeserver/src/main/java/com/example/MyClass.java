@@ -38,18 +38,23 @@ public class MyClass {
         }
 
         defineFigures();
+        clientList.get(0).runConnection();
+        clientList.get(1).runConnection();
     }
 
     private static void defineFigures() {
         Random random = new Random();
-        int figureCode = random.nextInt(MAXIMUM_CLIENTS);
-
-        //TODO
+        int figurePlayer1 = random.nextInt(MAXIMUM_CLIENTS);
+        int figurePlayer2 = 0;
+        if (figurePlayer1 == 0) {
+            figurePlayer2 = 1;
+        }
 
         for (int i = 0; i < MAXIMUM_CLIENTS; i++) {
-            if (i == 0 && figureCode == 0) {
-                String figure = "figure:zero";
-                clientList.get(i).setFigure(figure);
+            if (i == 0) {
+                clientList.get(i).setFigure(figurePlayer1);
+            } else if (i == 1) {
+                clientList.get(i).setFigure(figurePlayer2);
             }
         }
     }

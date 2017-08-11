@@ -51,7 +51,7 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
         float x = event.getX();
         float y = event.getY();
 
-        out.println();
+        //out.println();
         return true;
     }
 
@@ -77,21 +77,13 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
 
                 }
 
-                String input = "";
-                while (true) {
-                    try {
-                        // TODO
-                        input = in.readLine();
-                    } catch (IOException e) {
-
-                    }
-
-                    if (input.equalsIgnoreCase("Game Over")) {
-                        break;
-                    } else if (input.equals(OPPONENT_VALUE) && input.equals(FIGURE_VALUE)) {
+                String input;
+                try {
+                    while ((input = in.readLine()) != null)  {
                         Log.d("---My Log---", input);
-                        break;
                     }
+                } catch (IOException e) {
+
                 }
 
                 closeConnection();

@@ -26,8 +26,12 @@ class Client {
         }
     }
 
-    void setFigure(String figure) {
-        this.figure = figure;
+    void setFigure(int figureCode) {
+        if (figureCode == 0) {
+            figure = "server:figure:zero";
+        } else if (figureCode == 1) {
+            figure = "server:figure:cross";
+        }
     }
 
     void runConnection() {
@@ -35,10 +39,19 @@ class Client {
             @Override
             public void run() {
                 if (MyClass.isMaximumClients()) {
-                    System.out.println("Clients list is full");
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("opponent:true").append("\n").append(figure);
-                    out.println(sb);
+                    String pack = "server:opponent:true".concat("\n").concat(figure);
+                    out.println(pack);
+                }
+
+                String input;
+                try {
+                    while ((input = in.readLine()) != null) {
+                        if (input.equalsIgnoreCase("Game Over")) {
+                            break;
+                        }
+                    }
+                } catch (IOException e) {
+                    System.out.println("ERROR:" + " reading error");
                 }
 
                 closeConnection();
@@ -54,21 +67,6 @@ class Client {
             System.out.println("Connection close");
         } catch (IOException e) {
             System.out.println("ERROR:" + " connection not close");
-        }
-    }
-
-    private void f1() {
-        String input = "";
-        while (true) {
-            try {
-                input = in.readLine();
-            } catch (IOException e) {
-                System.out.println("ERROR:" + " reading error");
-            }
-
-            if (input.equalsIgnoreCase("Game Over")) {
-                break;
-            }
         }
     }
 }
