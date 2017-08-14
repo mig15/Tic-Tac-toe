@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -91,7 +92,9 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
 
                 String input;
                 try {
+                    //TODO переделать условие цикла
                     while ((input = in.readLine()) != null)  {
+                        Log.d("---My Log---", "on phone: " + input);
                         handler.sendMessage(handler.obtainMessage(0, input));
                     }
                 } catch (IOException e) {
@@ -105,7 +108,7 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
 
     private void closeConnection() {
         try {
-            out.println("Game Over");
+            out.println("game over");
             fromServerSocket.close();
             in.close();
             out.close();
@@ -124,15 +127,13 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
                 break;
             case "server:figure:cross":
                 figureCode = 1;
+                myStep = true;
                 break;
             case "server:name:player1":
                 playerName = "player1";
                 break;
             case "server:name:player2":
                 playerName = "player2";
-                break;
-            case "server:step:true":
-                myStep = true;
                 break;
         }
     }

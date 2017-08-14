@@ -9,11 +9,12 @@ import java.util.Random;
 
 public class MyClass {
 
-    private static final int MAXIMUM_CLIENTS = 2;
+    private static final int MAXIMUM_PLAYERS = 2;
 
     private static ServerSocket serverSocket;
 
-    private static List<Client> clientList = new ArrayList<>();
+    private static List<Player> playerList = new ArrayList<>();
+    private static volatile List<String> messages = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
@@ -24,43 +25,65 @@ public class MyClass {
         }
 
         int clientCount = 0;
-        while (clientList.size() < MAXIMUM_CLIENTS) {
+        while (playerList.size() < MAXIMUM_PLAYERS) {
             try {
                 System.out.println("Waiting client");
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connect");
-                Client client = new Client(clientSocket);
+                System.out.println("Player connect");
+                Player player = new Player(clientSocket);
                 clientCount++;
-                client.setClientName("player" + Integer.toString(clientCount));
-                clientList.add(client);
+                player.setClientName("player" + Integer.toString(clientCount));
+                playerList.add(player);
             } catch (IOException e) {
                 System.out.println("ERROR:" + " client not connect");
             }
         }
 
         defineFigures();
-        clientList.get(0).runConnection();
-        clientList.get(1).runConnection();
+        playerList.get(0).runConnection();
+        playerList.get(1).runConnection();
+        f();
     }
 
     private static void defineFigures() {
         Random random = new Random();
-        int figurePlayer1 = random.nextInt(MAXIMUM_CLIENTS);
+        int figurePlayer1 = random.nextInt(MAXIMUM_PLAYERS);
         int figurePlayer2 = 0;
         if (figurePlayer1 == 0) {
             figurePlayer2 = 1;
         }
 
-        for (int i = 0; i < MAXIMUM_CLIENTS; i++) {
+        for (int i = 0; i < MAXIMUM_PLAYERS; i++) {
             if (i == 0) {
-                clientList.get(i).setFigure(figurePlayer1);
+                playerList.get(i).setFigure(figurePlayer1);
             } else if (i == 1) {
-                clientList.get(i).setFigure(figurePlayer2);
+                playerList.get(i).setFigure(figurePlayer2);
             }
         }
     }
 
-    static boolean isMaximumClients() {
-        return clientList.size() == MAXIMUM_CLIENTS;
+    static boolean isMaximumPlayers() {
+        return playerList.size() == MAXIMUM_PLAYERS;
+    }
+
+    static void addMSG(String msg) {
+        messages.add(msg);
+    }
+
+    private static void f() {
+        while (!Player.isGameOver()) {
+            if (messages.size() > 0) {
+                String str = messages.get(0);
+                int index = str.indexOf(":");
+
+                if (str.substring(0, index).equals("player1")) {
+                    playerList.get(1).sendMSG(str);
+                } else if (str.substring(0, index).equals("player2")) {
+                    playerList.get(0).sendMSG(str);
+                }
+
+                messages.remove(0);
+            }
+        }
     }
 }

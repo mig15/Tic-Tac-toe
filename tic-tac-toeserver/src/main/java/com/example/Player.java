@@ -6,16 +6,17 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-class Client {
+class Player {
 
     private Socket clientSocket;
     private BufferedReader in;
     private PrintWriter out;
 
+    private static boolean gameOver = false;
     private String figure;
     private String clientName;
 
-    Client(Socket clientSocket) {
+    Player(Socket clientSocket) {
         this.clientSocket = clientSocket;
 
         try {
@@ -25,6 +26,10 @@ class Client {
         } catch (IOException e) {
             System.out.println("ERROR:" + " IO streams not create");
         }
+    }
+
+    static boolean isGameOver() {
+        return gameOver;
     }
 
     void setFigure(int figureCode) {
@@ -43,17 +48,22 @@ class Client {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if (MyClass.isMaximumClients()) {
+                if (MyClass.isMaximumPlayers()) {
                     out.println("server:opponent:true");
                     out.println("server:name:" + clientName);
                     out.println("server:figure:" + figure);
                 }
 
-                String input;
                 try {
-                    while ((input = in.readLine()) != null) {
-                        if (input.equalsIgnoreCase("Game Over")) {
-                            break;
+                    while (!gameOver) {
+                        String input = in.readLine();
+                        switch (input) {
+                            case "game over":
+                                gameOver = true;
+                                break;
+                            default:
+                                MyClass.addMSG(input);
+                                break;
                         }
                     }
                 } catch (IOException e) {
@@ -74,5 +84,9 @@ class Client {
         } catch (IOException e) {
             System.out.println("ERROR:" + " connection not close");
         }
+    }
+
+    void sendMSG(String msg) {
+        out.println(msg);
     }
 }
