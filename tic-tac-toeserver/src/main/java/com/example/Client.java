@@ -13,6 +13,7 @@ class Client {
     private PrintWriter out;
 
     private String figure;
+    private String clientName;
 
     Client(Socket clientSocket) {
         this.clientSocket = clientSocket;
@@ -28,10 +29,14 @@ class Client {
 
     void setFigure(int figureCode) {
         if (figureCode == 0) {
-            figure = "server:figure:zero";
+            figure = "zero";
         } else if (figureCode == 1) {
-            figure = "server:figure:cross";
+            figure = "cross";
         }
+    }
+
+    void setClientName(String clientName) {
+        this.clientName = clientName;
     }
 
     void runConnection() {
@@ -40,7 +45,8 @@ class Client {
             public void run() {
                 if (MyClass.isMaximumClients()) {
                     out.println("server:opponent:true");
-                    out.println(figure);
+                    out.println("server:name:" + clientName);
+                    out.println("server:figure:" + figure);
                 }
 
                 String input;

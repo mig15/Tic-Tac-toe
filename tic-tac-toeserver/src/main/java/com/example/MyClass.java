@@ -23,14 +23,15 @@ public class MyClass {
             System.out.println("ERROR:" + " serverSocket not create");
         }
 
-
+        int clientCount = 0;
         while (clientList.size() < MAXIMUM_CLIENTS) {
-            Client client;
             try {
                 System.out.println("Waiting client");
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client connect");
-                client = new Client(clientSocket);
+                Client client = new Client(clientSocket);
+                clientCount++;
+                client.setClientName("player" + Integer.toString(clientCount));
                 clientList.add(client);
             } catch (IOException e) {
                 System.out.println("ERROR:" + " client not connect");

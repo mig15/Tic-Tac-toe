@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -31,7 +30,9 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
     private ConstraintLayout constraintLayout_parent;
     private TicTacToeDrawer view_gameField;
 
+    private String playerName;
     private boolean opponent;
+    private boolean myStep;
     private int figureCode;
 
 
@@ -62,7 +63,7 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
         float x = event.getX();
         float y = event.getY();
 
-        //out.println();
+        doStep(x, y);
         return true;
     }
 
@@ -114,7 +115,6 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
     }
 
     private void f(String pack) {
-        Log.d("---My Log---", pack);
         switch (pack) {
             case "server:opponent:true":
                 opponent = true;
@@ -125,6 +125,44 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
             case "server:figure:cross":
                 figureCode = 1;
                 break;
+            case "server:name:player1":
+                playerName = "player1";
+                break;
+            case "server:name:player2":
+                playerName = "player2";
+                break;
+            case "server:step:true":
+                myStep = true;
+                break;
         }
+    }
+
+    private String parseMSG(String msg) {
+        int index = msg.lastIndexOf(":");
+        return msg.substring(0, index + 1);
+    }
+
+    private void doStep(float x, float y) {
+        if (opponent && myStep) {
+            final int cell = view_gameField.defineTouchCell(x, y);
+
+            if (isCellFree(cell)) {
+                myStep = false;
+                view_gameField.setCellNumber(cell);
+                view_gameField.setFigureCode(figureCode);
+                view_gameField.invalidate();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        out.println(playerName + ":" + Integer.toString(cell) + ":" + Integer.toString(figureCode));
+                    }
+                }).start();
+            }
+        }
+    }
+
+    private boolean isCellFree(int cell) {
+        return view_gameField.getCellState(cell) == TicTacToeDrawer.STATE_OF_FREE_CELL;
     }
 }
