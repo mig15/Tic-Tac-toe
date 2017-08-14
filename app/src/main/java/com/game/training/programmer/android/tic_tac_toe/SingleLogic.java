@@ -1,6 +1,8 @@
 package com.game.training.programmer.android.tic_tac_toe;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,7 @@ public class SingleLogic extends AppCompatActivity implements View.OnTouchListen
     private static final int BOTTOM_RIGHT_CELL = 9;
 
     private Random random;
+    private Handler handler;
 
     private ConstraintLayout constraintLayout_parent;
     private TicTacToeDrawer view_gameField;
@@ -44,18 +47,21 @@ public class SingleLogic extends AppCompatActivity implements View.OnTouchListen
         random = new Random();
 
         constraintLayout_parent = (ConstraintLayout) findViewById(R.id.constraintLayout_parent_activity_main);
-        constraintLayout_parent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                doNextComputerStep();
-            }
-        });
         view_gameField = (TicTacToeDrawer) findViewById(R.id.view_gameField_activity_main);
         ViewTreeObserver viewTreeObserver = view_gameField.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(this);
         view_gameField.setOnTouchListener(this);
 
         arrayFreeCell = new ArrayList<>();
+
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.what ==  12) {
+                    view_gameField.invalidate();
+                }
+            }
+        };
     }
 
     @Override
@@ -64,6 +70,13 @@ public class SingleLogic extends AppCompatActivity implements View.OnTouchListen
         float y = event.getY();
 
         doMyStep(x, y);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                doNextComputerStep();
+            }
+        }).start();
 
         return true;
     }
@@ -80,11 +93,11 @@ public class SingleLogic extends AppCompatActivity implements View.OnTouchListen
 
     private void doMyStep(float x, float y) {
         if (myStep) {
-            myStep = false;
             int cell = view_gameField.defineTouchCell(x, y);
-            view_gameField.setCellNumber(cell);
 
             if (isCellFree(cell)) {
+                myStep = false;
+                view_gameField.setCellNumber(cell);
                 view_gameField.setFigureCode(playerFigureCode);
                 view_gameField.invalidate();
                 computerStep = true;
@@ -109,6 +122,7 @@ public class SingleLogic extends AppCompatActivity implements View.OnTouchListen
             }
 
             countComputerStep++;
+            handler.sendEmptyMessage(12);
             myStep = true;
         }
     }
@@ -118,11 +132,9 @@ public class SingleLogic extends AppCompatActivity implements View.OnTouchListen
             if (isCellFree(MID_CENTER_CELL)) {
                 view_gameField.setCellNumber(MID_CENTER_CELL);
                 view_gameField.setFigureCode(computerFigureCode);
-                view_gameField.invalidate();
             } else {
                 view_gameField.setCellNumber(BOTTOM_LEFT_CELL);
                 view_gameField.setFigureCode(computerFigureCode);
-                view_gameField.invalidate();
             }
         }
     }
@@ -133,7 +145,6 @@ public class SingleLogic extends AppCompatActivity implements View.OnTouchListen
             if (cell != 0) {
                 view_gameField.setCellNumber(cell);
                 view_gameField.setFigureCode(computerFigureCode);
-                view_gameField.invalidate();
             } else {
                 if ((view_gameField.getCellState(TOP_LEFT_CELL) == TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS
                         && view_gameField.getCellState(BOTTOM_RIGHT_CELL) == TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS)
@@ -141,17 +152,14 @@ public class SingleLogic extends AppCompatActivity implements View.OnTouchListen
                         && view_gameField.getCellState(BOTTOM_LEFT_CELL) == TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS)) {
                     view_gameField.setCellNumber(MID_RIGHT_CELL);
                     view_gameField.setFigureCode(computerFigureCode);
-                    view_gameField.invalidate();
                 } else if (view_gameField.getCellState(TOP_LEFT_CELL) == TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS
                         && view_gameField.getCellState(MID_RIGHT_CELL) == TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS) {
                     view_gameField.setCellNumber(TOP_RIGHT_CELL);
                     view_gameField.setFigureCode(computerFigureCode);
-                    view_gameField.invalidate();
                 } else {
                     int var = getFreeCellForNextStep();
                     view_gameField.setCellNumber(var);
                     view_gameField.setFigureCode(computerFigureCode);
-                    view_gameField.invalidate();
                 }
             }
         }
@@ -163,18 +171,15 @@ public class SingleLogic extends AppCompatActivity implements View.OnTouchListen
             if (cell != 0) {
                 view_gameField.setCellNumber(cell);
                 view_gameField.setFigureCode(computerFigureCode);
-                view_gameField.invalidate();
             } else {
                 cell = checkLinesForVictory(TicTacToeDrawer.STATE_OF_CELL_WITH_CROSS);
                 if (cell != 0) {
                     view_gameField.setCellNumber(cell);
                     view_gameField.setFigureCode(computerFigureCode);
-                    view_gameField.invalidate();
                 } else {
                     int var = getFreeCellForNextStep();
                     view_gameField.setCellNumber(var);
                     view_gameField.setFigureCode(computerFigureCode);
-                    view_gameField.invalidate();
                 }
             }
         }

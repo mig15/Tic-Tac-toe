@@ -53,7 +53,6 @@ public class TicTacToeDrawer extends View {
     private int bottomRightCell = 0;
 
     private int cellNumber;
-    private int figureCode;
 
     public TicTacToeDrawer(Context context) {
         super(context);
@@ -75,7 +74,11 @@ public class TicTacToeDrawer extends View {
     }
 
     void setFigureCode(int figureCode) {
-        this.figureCode = figureCode;
+        if (figureCode == 0) {
+            zero.addZero();
+        } else if (figureCode == 1) {
+            cross.addCross();
+        }
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -135,12 +138,6 @@ public class TicTacToeDrawer extends View {
                 firstHorizontalSeparativeLineEndX, firstHorizontalSeparativeLineEndY, paintSeparativeLines);
         canvas.drawLine(secondHorizontalSeparativeLineStartX, secondHorizontalSeparativeLineStartY,
                 secondHorizontalSeparativeLineEndX, secondHorizontalSeparativeLineEndY, paintSeparativeLines);
-
-        if (figureCode == 0) {
-            zero.addZero();
-        } else if (figureCode == 1) {
-            cross.addCross();
-        }
 
         canvas.drawPath(zero.pathZero, zero.paintZero);
         canvas.drawPath(cross.pathCrosses, cross.paintCrosses);
