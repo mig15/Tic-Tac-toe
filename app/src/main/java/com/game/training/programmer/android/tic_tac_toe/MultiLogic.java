@@ -7,10 +7,10 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,11 +30,12 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
 
     private ConstraintLayout constraintLayout_parent;
     private TicTacToeDrawer view_gameField;
+    private TextView textView_step;
 
-    private String playerName;
+    private String playerName, opponentName;
     private boolean opponent;
     private boolean myStep;
-    private int figureCode;
+    private int myFigureCode, opponentFigureCode;
 
 
     @Override
@@ -47,6 +48,7 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
         ViewTreeObserver viewTreeObserver = view_gameField.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(this);
         view_gameField.setOnTouchListener(this);
+        textView_step = (TextView) findViewById(R.id.textView_step_activity_tictactoe);
 
         runConnection();
 
@@ -94,7 +96,6 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
                 try {
                     //TODO переделать условие цикла
                     while ((input = in.readLine()) != null)  {
-                        Log.d("---My Log---", "on phone: " + input);
                         handler.sendMessage(handler.obtainMessage(0, input));
                     }
                 } catch (IOException e) {
@@ -117,32 +118,6 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
         }
     }
 
-    private void f(String pack) {
-        switch (pack) {
-            case "server:opponent:true":
-                opponent = true;
-                break;
-            case "server:figure:zero":
-                figureCode = 0;
-                break;
-            case "server:figure:cross":
-                figureCode = 1;
-                myStep = true;
-                break;
-            case "server:name:player1":
-                playerName = "player1";
-                break;
-            case "server:name:player2":
-                playerName = "player2";
-                break;
-        }
-    }
-
-    private String parseMSG(String msg) {
-        int index = msg.lastIndexOf(":");
-        return msg.substring(0, index + 1);
-    }
-
     private void doStep(float x, float y) {
         if (opponent && myStep) {
             final int cell = view_gameField.defineTouchCell(x, y);
@@ -150,13 +125,14 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
             if (isCellFree(cell)) {
                 myStep = false;
                 view_gameField.setCellNumber(cell);
-                view_gameField.setFigureCode(figureCode);
+                view_gameField.setFigureCode(myFigureCode);
                 view_gameField.invalidate();
+                textView_step.setText("Не твой ход");
 
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        out.println(playerName + ":" + Integer.toString(cell) + ":" + Integer.toString(figureCode));
+                        out.println(playerName + ":cell" + Integer.toString(cell) + ":" + Integer.toString(myFigureCode));
                     }
                 }).start();
             }
@@ -165,5 +141,49 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
 
     private boolean isCellFree(int cell) {
         return view_gameField.getCellState(cell) == TicTacToeDrawer.STATE_OF_FREE_CELL;
+    }
+
+    private void f(String pack) {
+        switch (pack) {
+            case "server:opponent:true":
+                opponent = true;
+                break;
+            case "server:figure:zero":
+                myFigureCode = 0;
+                opponentFigureCode = 1;
+                textView_step.setText("Не твой ход");
+                break;
+            case "server:figure:cross":
+                myFigureCode = 1;
+                opponentFigureCode = 0;
+                textView_step.setText("Твой ход");
+                myStep = true;
+                break;
+            case "server:name:player1":
+                playerName = "player1";
+                opponentName = "player2";
+                break;
+            case "server:name:player2":
+                playerName = "player2";
+                opponentName = "player1";
+                break;
+            default:
+                parseMSG(pack);
+                break;
+        }
+    }
+
+    private void parseMSG(String msg) {
+        int last = msg.lastIndexOf(":");
+        String str = msg.substring(0, last - 1);
+
+        if (str.equals(opponentName + ":cell")) {
+            int cell = Integer.parseInt(msg.substring(last - 1, last));
+            view_gameField.setCellNumber(cell);
+            view_gameField.setFigureCode(opponentFigureCode);
+            view_gameField.invalidate();
+            textView_step.setText("Твой ход");
+            myStep = true;
+        }
     }
 }
