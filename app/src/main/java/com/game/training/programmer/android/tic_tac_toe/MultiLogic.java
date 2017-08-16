@@ -21,7 +21,7 @@ import java.net.Socket;
 public class MultiLogic extends AppCompatActivity implements View.OnTouchListener,
         ViewTreeObserver.OnGlobalLayoutListener {
 
-    private static final String HOST_IP = "192.168.221.178";
+    private static final String HOST_IP = "192.168.221.1";
 
     private Socket fromServerSocket;
     private BufferedReader in;
@@ -85,7 +85,7 @@ public class MultiLogic extends AppCompatActivity implements View.OnTouchListene
             @Override
             public void run() {
                 try {
-                    fromServerSocket = new Socket(HOST_IP, 9954);
+                    fromServerSocket = new Socket("192.168.221.178", 2021);
                     in = new BufferedReader(new InputStreamReader(fromServerSocket.getInputStream()));
                     out = new PrintWriter(fromServerSocket.getOutputStream(), true);
                 } catch (IOException e) {

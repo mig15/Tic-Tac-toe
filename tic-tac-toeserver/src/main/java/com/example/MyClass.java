@@ -18,7 +18,7 @@ public class MyClass {
 
     public static void main(String[] args) {
         try {
-            serverSocket = new ServerSocket(9954);
+            serverSocket = new ServerSocket(2021);
             System.out.println("ServerSocket create");
         } catch (IOException e) {
             System.out.println("ERROR:" + " serverSocket not create");
